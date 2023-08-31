@@ -1,56 +1,23 @@
 const io = require("socket.io")();
 const crypto = require("crypto");
 const aes256 = require("aes256");
-const mongoose = require("mongoose");
-//const express =
+const cors = require("cors");
+const http = require("http");
+const {DataModel} = require('./models/models')
+const MongoDbConnection= require('./dbutils/dbconnect')
 
-// Connect to MongoDB using Mongoose
+const express = require('express')
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const mongoDbConnection = () => {
-  mongoose
-    .connect(
-      "hey, paste an url of your mongodb atlas",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    )
-    .then((res) => {
-      console.log(res.connection.name, res.connection.host, "db connected");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-mongoDbConnection();
-
-// Define a MongoDB schema for time-series data
-const dataSchema = new mongoose.Schema({
-  timestamp: { type: Date, default: Date.now },
-
-  data: [
-    {
-      name: String,
-      origin: String,
-      destination: String,
-    },
-  ],
-  particularData: {
-    name: String,
-    origin: String,
-    destination: String,
-  },
-
-  count: { type: Number, default: 0 },
-});
-
-const DataModel = mongoose.model("listenerdatas", dataSchema);
+MongoDbConnection();
 
 io.on("connection", (socket) => {
   console.log("emitter connected");
 
   socket.on("message", (encryptedMessage) => {
-    console.log(encryptedMessage);
     const passKey = "syook-bbk";
     const parsedObjects = encryptedMessage.split("|");
     const ArrData = [];
@@ -71,6 +38,7 @@ io.on("connection", (socket) => {
         if (computedSecretKey === data.secret_key) {
           const newData = new DataModel({
             timestamp: new Date(),
+            data:[],
             particularData:{
                 name: data.name,
                 origin: data.origin,
@@ -78,7 +46,6 @@ io.on("connection", (socket) => {
             }
           });
           ArrData.push(newData);
-        //   console.log(newData);
         } else {
           console.error("Unable to match the integrity");
         }
@@ -112,15 +79,34 @@ async function appendData(data) {
   }
   // Append the new data to the existing or new document
   for (let i = 0; i < data.length; i++) {
-    console.log("correct data is  ",data[i])
-    document.data.push(data[i]);
+    let temp = new Object()
+    temp.name = data[i].particularData.name
+    temp.origin = data[i].particularData.origin
+    temp.destination = data[i].particularData.destination
+    document.data.push(temp);
   }
+  
   document.count = document.count + 1;
 
-  // Save the document
-  await document.save();
-
-  console.log("Data appended:", document.count);
+  await document.save();  //saves the document
 }
+const server = http.createServer(app);
 
+server.listen(3003, (err) => {
+  if (!err) {
+    console.log("Listener Service Is Running On port 3003");
+  } else {
+    console.error(err);
+  }
+});
+
+app.get('/api/messages', async (req, res) => {
+  try {
+    const documents = await DataModel.find();
+    res.json(documents);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: 'An error occurred' });
+  }
+})
 io.listen(3005); // Listen on port 3005
