@@ -1,0 +1,19 @@
+{
+  "name": "emmitter",
+  "version": "1.0.0",
+  "description": "Assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aes256": "^1.1.0",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2",
+    "nodemon": "^3.0.1",
+    "socket.io-client": "^4.7.2"
+  }
+}
