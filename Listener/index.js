@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const mongoDbConnection = () => {
   mongoose
     .connect(
-      "mongodb+srv://bbk:mAZUxyRVzObUeSZo@cluster1.kkjl4.mongodb.net/forSyook?retryWrites=true&w=majority",
+      "hey, paste an url of your mongodb atlas",
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
