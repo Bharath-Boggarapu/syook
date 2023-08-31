@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "aes256": "^1.1.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "mongoose": "^7.5.0",
     "nodemon": "^3.0.1",
