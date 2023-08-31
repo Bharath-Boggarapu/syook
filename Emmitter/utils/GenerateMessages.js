@@ -17,8 +17,8 @@ function GetRandomNumber(min, max) {
 }
 
 function GenerateEncryptedMessage() {
-  const min = 3;
-  const max = 6;
+  const min = 49;
+  const max = 449;
   const randomTimes = GetRandomNumber(min, max);
   finalEncryptedMessage = "";
   const dataArr = [];
